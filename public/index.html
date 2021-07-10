@@ -1,0 +1,38 @@
+<html>
+    <body>
+        <textarea id="code"></textarea>
+        <button id="execute">Execute</button>
+        <h1 id='event'></h1>
+
+        <script>
+            let webSocket = new WebSocket("ws://localhost:3000/ws");
+            let code = document.getElementById('code')
+            let execute = document.getElementById('execute')
+            let event = document.getElementById('event')
+
+            let db = false
+
+            execute.addEventListener('click', () => {
+                if (db) return
+                db = true
+                webSocket.send(JSON.stringify({
+                    "Action":"Execute",
+                    "Code":code.value
+                }))
+                event.innerText = "Executed!"
+                setTimeout(() => {
+                    event.innerText = ""
+                    db = false
+                }, 1000)
+            })
+
+            let keepalive = JSON.stringify({
+                Action: "Keep-Connection-Alive"
+            })
+
+            setInterval(() => {
+                webSocket.send(keepalive)
+            }, 2500);
+        </script>
+    </body>
+</html>
